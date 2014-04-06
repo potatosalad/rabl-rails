@@ -57,6 +57,20 @@ module Visitors
       @_result.merge! sub_visit(object, n.template.nodes)
     end
 
+    def result
+      if RablRails.configuration.hash_modifiers?
+        if RablRails.configuration.replace_nil_values_with_empty_strings
+          @_result.each { |k, v| @_result[k] = '' if v == nil }
+        elsif RablRails.configuration.replace_empty_string_values_with_nil
+          @_result.each { |k, v| @_result[k] = nil if v == '' }
+        end
+
+        RablRails.configuration.exclude_nil_values ? @_result.delete_if { |_, v| v == nil } : @_result
+      else
+        @_result
+      end
+    end
+
     protected
 
     #
